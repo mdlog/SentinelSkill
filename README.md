@@ -27,7 +27,7 @@ corrections).
 ## Repo layout
 
 ```
-SKILL.md                     agentskills.io Skill manifest
+sentinel-skill/SKILL.md      agentskills.io Skill manifest (name matches folder)
 src/
   index.ts                   MCP stdio entry
   server.ts                  registers vet_skill + guard_transaction
