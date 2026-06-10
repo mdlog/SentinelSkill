@@ -13,7 +13,7 @@ import { guardTransaction } from "../dist/tools/guardTransaction.js";
 import { getSkillScanner } from "../dist/scanners/skillScanner.js";
 import { evaluateSkill } from "../dist/policy/engine.js";
 import { loadPolicy } from "../dist/policy/loader.js";
-import { latestAttestation } from "../dist/clients/chainClient.js";
+import { getAttestation } from "../dist/tools/getAttestation.js";
 import { fromBitmask } from "../dist/flags.js";
 
 const EXPLORER = "https://atlantic.pharosscan.xyz";
@@ -80,17 +80,16 @@ async function main() {
   // ── 5. Reuse / composability ───────────────────────────────────────────
   await sleep(3000); // let scenario-1 write settle before the reuse read
   head(5, "Cross-agent reuse (read registry, no re-scan)");
-  console.log("  Agent #2 queries the on-chain registry for the malicious Skill...");
-  const att = await latestAttestation("./fixtures/malicious-skill");
-  if (!att) {
+  console.log("  Agent #2 calls get_attestation (reads registry on-chain, no re-scan)...");
+  const att = await getAttestation({ subject: "./fixtures/malicious-skill" });
+  if (!att.found) {
     console.log("  (no attestation found — was scenario 1's write skipped?)");
   } else {
-    const v = Number(att.verdict);
     console.log(`  ✓ found prior attestation — no re-scan needed:`);
-    console.log(`      subjectType: ${SUBJECT_TYPE[Number(att.subjectType)]}`);
-    console.log(`      verdict    : ${ON_CHAIN_VERDICT[v]}`);
-    console.log(`      score      : ${Number(att.score)}/100`);
-    console.log(`      flags      : ${fromBitmask(Number(att.flags)).join(", ")}`);
+    console.log(`      subjectType: ${att.subjectType}`);
+    console.log(`      verdict    : ${att.verdict}`);
+    console.log(`      score      : ${att.score}/100`);
+    console.log(`      flags      : ${att.flags.join(", ")}`);
     console.log(`      attester   : ${att.attester}`);
   }
 

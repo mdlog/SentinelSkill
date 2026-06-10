@@ -92,6 +92,25 @@ describe("evaluateTransaction", () => {
     expect(evaluateTransaction(intent("600"), gp(), policy).verdict).toBe("HOLD");
   });
 
+  it("fail-safe: GoPlus reputation unavailable -> HOLD (never silent ALLOW)", () => {
+    const d = evaluateTransaction(intent("100"), gp({ flags: ["goplus_unavailable"] }), policy);
+    expect(d.verdict).toBe("HOLD");
+    expect(d.reasons.join(" ")).toMatch(/unavailable/i);
+  });
+
+  it("HOLDs + flags an unlimited ERC-20 approval from calldata", () => {
+    const calldata = "0x095ea7b3" + "0".repeat(64) + "f".repeat(64); // approve(spender, MAX)
+    const d = evaluateTransaction({ chainId: 688689, to: "0xabc", value: "0", calldata }, gp(), policy);
+    expect(d.verdict).toBe("HOLD");
+    expect(d.flags).toContain("unlimited_approval");
+  });
+
+  it("does NOT flag a bounded approval", () => {
+    const calldata = "0x095ea7b3" + "0".repeat(64) + "0".repeat(62) + "64"; // approve(spender, 100)
+    const d = evaluateTransaction({ chainId: 688689, to: "0xabc", value: "0", calldata }, gp(), policy);
+    expect(d.flags).not.toContain("unlimited_approval");
+  });
+
   it("is deterministic (same inputs -> same verdict)", () => {
     const a = evaluateTransaction(intent("600"), gp(), policy);
     const b = evaluateTransaction(intent("600"), gp(), policy);

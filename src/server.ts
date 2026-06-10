@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { vetSkill } from "./tools/vetSkill.js";
 import { guardTransaction } from "./tools/guardTransaction.js";
+import { getAttestation } from "./tools/getAttestation.js";
 
 export function createServer(): McpServer {
   const server = new McpServer({
@@ -51,6 +52,29 @@ export function createServer(): McpServer {
     },
     async ({ chainId, to, token, value, calldata, policyId }) => {
       const result = await guardTransaction({ chainId, to, token, value, calldata, policyId });
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
+
+  server.registerTool(
+    "get_attestation",
+    {
+      title: "Get Attestation (cross-agent reuse)",
+      description:
+        "Read the latest on-chain SentinelRegistry attestation for a subject " +
+        "(a Skill source string, e.g. a GitHub URL, or a tx-intent JSON) WITHOUT " +
+        "re-scanning. Lets a second agent reuse a prior ALLOW/HOLD/DENY verdict — " +
+        "cross-agent composability. Returns { found: false } if none exists.",
+      inputSchema: {
+        subject: z
+          .string()
+          .describe("The Skill source (e.g. GitHub URL) or tx-intent JSON used in the original check"),
+      },
+    },
+    async ({ subject }) => {
+      const result = await getAttestation({ subject });
       return {
         content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
       };

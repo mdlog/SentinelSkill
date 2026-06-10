@@ -93,6 +93,12 @@ export function evaluateTransaction(
     reasons.push("recipient is sanctioned");
   }
 
+  // ── Fail-safe: GoPlus reputation unavailable -> HOLD (never silently ALLOW) ──
+  if (goplus.address.flags.includes("goplus_unavailable")) {
+    hold = true;
+    reasons.push("GoPlus address reputation unavailable — fail-safe HOLD");
+  }
+
   // ── Token-level ──
   if (goplus.token.queried) {
     if (p.block_honeypot && goplus.token.honeypot) {
@@ -109,6 +115,13 @@ export function evaluateTransaction(
         )}`,
       );
     }
+  }
+
+  // ── Unlimited token approval (static calldata check) ──
+  if (isUnlimitedApproval(intent.calldata)) {
+    flags.push("unlimited_approval");
+    hold = true;
+    reasons.push("unlimited ERC-20 approval detected in calldata");
   }
 
   // ── Value limits (native-unit, USD oracle descoped) ──
@@ -157,5 +170,22 @@ function safeBigInt(s: string): bigint {
     return BigInt(s);
   } catch {
     return 0n;
+  }
+}
+
+// ERC-20 approve(address,uint256). Flags near-infinite allowances (a common
+// drain vector) by inspecting the amount word of the calldata.
+const APPROVE_SELECTOR = "0x095ea7b3";
+const UNLIMITED_APPROVAL_THRESHOLD = 1n << 200n; // ~1.6e60 — real transfers never reach this
+function isUnlimitedApproval(calldata?: string): boolean {
+  if (!calldata) return false;
+  const data = calldata.toLowerCase();
+  if (!data.startsWith(APPROVE_SELECTOR)) return false;
+  const hex = data.slice(2); // selector(4) + spender(32) + amount(32) bytes
+  if (hex.length < 8 + 128) return false;
+  try {
+    return BigInt("0x" + hex.slice(8 + 64, 8 + 128)) >= UNLIMITED_APPROVAL_THRESHOLD;
+  } catch {
+    return false;
   }
 }

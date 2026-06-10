@@ -38,7 +38,7 @@
 
 SentinelSkill adalah sebuah **meta-Skill** (format `SKILL.md`) plus **MCP server** yang dipanggil oleh agent **sebelum** ia memasang Skill pihak ketiga atau mengeksekusi transaksi/pembayaran on-chain. Ia membungkus **CertiK Skill Scanner** (untuk risiko di level Skill) dan **GoPlus Security API** (untuk risiko di level transaksi/counterparty), menjalankan **policy engine** milik pemilik agent, lalu menuliskan **attestation on-chain** di Pharos sebagai jejak audit yang immutable dan dapat dipakai ulang oleh agent lain.
 
-Inti pembeda: SentinelSkill mengubah kriteria keamanan — yang di hackathon ini dinilai resmi lewat CertiK Skill Scanner — dari sekadar *checklist* menjadi **produk runtime yang aktif memblokir**. Ia berfungsi seperti "antivirus + firewall pre-flight" untuk agent yang memegang aset.
+Inti pembeda: SentinelSkill mengubah kriteria keamanan — yang menurut liputan pers kampanye disorot lewat CertiK Skill Scanner (tidak tercantum di halaman resmi DoraHacks `pharos-phase1`) — dari sekadar *checklist* menjadi **produk runtime yang aktif memblokir**. Ia berfungsi seperti "antivirus + firewall pre-flight" untuk agent yang memegang aset.
 
 **Satu kalimat:** *Skill yang mengamankan Skill lain.*
 
@@ -52,7 +52,7 @@ Visi Pharos AI Agent Layer adalah agent sebagai *economic actor* — memegang as
 
 **Permukaan 2 — Risiko di level transaksi (counterparty).** Bahkan Skill yang bersih bisa mengarahkan dana ke address jahat, token honeypot, kontrak phishing, atau approval tak terbatas. Agent tidak punya "akal sehat" untuk menolak ini tanpa lapisan pemeriksaan.
 
-Hari ini agent di ekosistem Pharos tidak punya guardrail runtime terpadu untuk dua hal ini. CertiK Skill Scanner sudah menjadi standar penilaian, tetapi ia bersifat *scan statis di luar runtime* — belum ada komponen yang **menempel di alur eksekusi agent** dan benar-benar **menahan/memblokir** aksi berisiko sambil mencatatnya secara verifiable.
+Hari ini agent di ekosistem Pharos tidak punya guardrail runtime terpadu untuk dua hal ini. CertiK Skill Scanner diposisikan sebagai standar keamanan dalam liputan pers kampanye, tetapi ia bersifat *scan statis di luar runtime* — belum ada komponen yang **menempel di alur eksekusi agent** dan benar-benar **menahan/memblokir** aksi berisiko sambil mencatatnya secara verifiable.
 
 **Konsekuensi jika tidak diselesaikan:** kehilangan dana karena Skill jahat atau transaksi ke pihak berbahaya, hilangnya kepercayaan terhadap seluruh ekosistem agent, dan kegagalan tesis Pharos "production, not demo".
 
@@ -379,7 +379,7 @@ contract SentinelRegistry {
 
 ## 11. Pertimbangan Keamanan & Privasi
 
-Karena ini **produk keamanan**, ia harus jadi teladan (kriteria juri menilai keamanan via CertiK Skill Scanner):
+Karena ini **produk keamanan**, ia harus jadi teladan (keamanan ditonjolkan sebagai standar lewat CertiK Skill Scanner dalam liputan pers kampanye — tidak tercantum eksplisit di halaman resmi event):
 
 - **Least privilege**: Skill tidak meminta akses filesystem/shell di luar yang dibutuhkan; tidak membaca kunci privat.
 - **Secrets**: API key (CertiK/GoPlus) dari environment variable, tidak pernah di-commit; sediakan `.env.example`.
@@ -393,14 +393,16 @@ Karena ini **produk keamanan**, ia harus jadi teladan (kriteria juri menilai kea
 
 ## 12. Metrik Keberhasilan (selaras kriteria juri)
 
-| Kriteria Juri | Metrik SentinelSkill |
+| Kriteria Juri (resmi DoraHacks) | Metrik SentinelSkill |
 |---|---|
-| **Keamanan** (CertiK) | Repo sendiri lolos `pass` skor tinggi; verdict konservatif terbukti pada fixture jahat |
-| **Inovasi** | Pertama: runtime security co-processor + attestation on-chain untuk agent |
-| **Eksekusi teknis** | MCP berjalan + contract ter-deploy + 3 skenario demo live |
-| **Usability** | Integrasi 2 panggilan tool; policy 1 file; verdict jelas + alasan |
-| **Business implication** | Model fee per-scan via x402 (stretch) → primitive berkelanjutan |
-| **Ecosystem-enabling** | Attestation dapat dipakai ulang lintas-agent (composability) |
+| **Originality & creativity** | Novel untuk ekosistem Pharos: runtime guardrail + attestation on-chain — *Skill yang mengamankan Skill* |
+| **Technical quality & completeness** | MCP server 3 tool + policy engine *pure* ter-unit-test + `SentinelRegistry` ter-deploy & terbukti on-chain |
+| **Practical use case for AI Agents** | Pre-flight wajib sebelum pasang Skill / bayar — mencegah exfiltrasi & transfer ke address jahat |
+| **Reusability & composability** | `get_attestation` membaca verdict on-chain → dipakai ulang lintas-agent tanpa scan ulang |
+| **Deployment/integrasi di Pharos** | `SentinelRegistry` live di Atlantic (688689); attestation terlihat di pharosscan |
+| **UX & dokumentasi** | Integrasi 3 panggilan tool; policy 1 file; verdict + alasan terstruktur; README lengkap |
+| **Keselarasan visi Pharos** | Agent jadi *economic actor* yang aman (hold aset, bayar via x402, kolaborasi A2A) |
+| *Keamanan (rubrik CertiK — sumber: pers)* | Engine lokal mengimplementasikan rubrik 5-kategori CertiK; verdict konservatif terbukti pada fixture jahat |
 
 ---
 

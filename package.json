@@ -1,7 +1,7 @@
 {
   "name": "sentinel-skill",
   "version": "0.1.0",
-  "description": "Runtime security co-processor & on-chain attestation layer for AI agents on Pharos. Wraps the CertiK Skill Scanner rubric + GoPlus Security API behind two MCP tools.",
+  "description": "Runtime security co-processor & on-chain attestation layer for AI agents on Pharos. Runs a local heuristic engine modeled on CertiK's published 5-category Skill-risk rubric (real CertiK Skill Scanner API feature-flagged, pending public access) + the live GoPlus Security API, behind MCP tools.",
   "type": "module",
   "engines": {
     "node": ">=18"
