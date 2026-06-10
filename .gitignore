@@ -1,0 +1,22 @@
+# Node
+node_modules/
+dist/
+*.log
+npm-debug.log*
+
+# Env / secrets — NEVER commit real keys
+.env
+.env.local
+contracts/.env
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/lib/
+
+# Temp scan workspaces (vet_skill clones repos here)
+.sentinel-tmp/
+
+# OS
+.DS_Store

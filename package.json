@@ -1,0 +1,44 @@
+{
+  "name": "sentinel-skill",
+  "version": "0.1.0",
+  "description": "Runtime security co-processor & on-chain attestation layer for AI agents on Pharos. Wraps the CertiK Skill Scanner rubric + GoPlus Security API behind two MCP tools.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "sentinel-skill": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "demo": "node --env-file=.env scripts/demo.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "mcp",
+    "ai-agent",
+    "security",
+    "pharos",
+    "certik",
+    "goplus",
+    "attestation"
+  ],
+  "author": "Jumardi",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "viem": "^2.48.0",
+    "yaml": "^2.5.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

@@ -1,0 +1,26 @@
+policyId: default
+
+# ── Skill vetting (Mode A) ────────────────────────────────────────────────
+skill_policy:
+  min_score: 80                       # below this -> not ALLOW
+  block_on_severity: [critical, high] # any finding at these severities -> DENY
+  allow_warn: false                   # scannerVerdict 'warn' -> HOLD (not ALLOW)
+
+# ── Transaction guarding (Mode B) ─────────────────────────────────────────
+# NOTE: USD limits from the original PRD are DESCOPED (no price oracle on
+# Pharos Atlantic). Limits are denominated in the native token's SMALLEST unit
+# (wei). value_unit documents this.
+transaction_policy:
+  value_unit: native_wei
+  block_malicious_address: true
+  block_sanctioned_address: true
+  block_phishing_address: true
+  block_honeypot: true
+  max_transfer_tax_bps: 1000          # 10.00% (buy/sell/transfer tax)
+  per_tx_limit_wei: "500000000000000000000"     # 500 PHRS
+  daily_limit_wei: "2000000000000000000000"     # 2000 PHRS (in-memory, resets on restart)
+  require_human_approval_above_wei: "1000000000000000000000"  # 1000 PHRS
+
+escalation:
+  on_hold: hold                       # hold | deny | warn
+  approver: ""                        # 0xOwner... or https://webhook (stretch)

@@ -1,0 +1,23 @@
+policyId: strict
+
+# Same as default but a HIGHER bar — used in the demo to show one policy file
+# flipping a borderline skill's verdict (ALLOW under default -> HOLD under strict).
+skill_policy:
+  min_score: 90                       # raised from 80
+  block_on_severity: [critical, high]
+  allow_warn: false
+
+transaction_policy:
+  value_unit: native_wei
+  block_malicious_address: true
+  block_sanctioned_address: true
+  block_phishing_address: true
+  block_honeypot: true
+  max_transfer_tax_bps: 500           # stricter: 5%
+  per_tx_limit_wei: "100000000000000000000"     # 100 PHRS
+  daily_limit_wei: "500000000000000000000"      # 500 PHRS
+  require_human_approval_above_wei: "100000000000000000000"  # 100 PHRS
+
+escalation:
+  on_hold: hold
+  approver: ""
